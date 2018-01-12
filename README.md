@@ -40,6 +40,11 @@ $ apm install language-powershell terminal-tab-service ide-powershell
 
 6. Change some code in this repo, run the "Reload Window" command, then try your changes!
 
+## Maintainers
+
+- [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
+- [Patrick Meinecke](https://github.com/SeeminglyScience) - [@SeeminglyScienc](http://twitter.com/SeeminglyScienc)
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).  Some portions of the
