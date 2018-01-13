@@ -36,7 +36,6 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
   activate() {
     // Ensure dependency packages are installed
-    console.log("About to install dependencies!");
     this.dependencyInstallPromise = packageDeps.install('ide-powershell');
 
     super.activate();
@@ -45,7 +44,6 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   async startServerProcess () {
     await this.dependencyInstallPromise;
     this.dependencyInstallPromise = null;
-    console.log("Done with dependencies!")
 
     // TODO: React to setting changes like vscode-powershell
     atom.config.observe('ide-powershell', (settings) => this.sessionSettings = settings);
