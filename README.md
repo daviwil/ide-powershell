@@ -18,17 +18,26 @@ To use this package, you must first install its dependencies.  There are some
 [build dependencies for node-gyp](https://github.com/nodejs/node-gyp#on-unix) that
 must be installed first depending on your platform.
 
+> NOTE: This is a temporary measure until precompiled binaries for `node-pty` can
+> be included with the `terminal-tab` package.
+
 Once the build dependencies have been installed, you can install the `ide-powershell`
-package and its dependencies in Atom:
+package!
+
+## Installation
+
+You can easily install this package using the following command
 
 ```
-$ apm install language-powershell terminal-tab-service atom-ide-ui ide-powershell
+apm install ide-powershell
 ```
+
+You can also find this package in Atom by running the command "Settings View: Install
+Packages and Themes" and then search for and install `ide-powershell`
 
 ## Development
 
-1. Follow the instructions in the Prerequisites section above but **exclude** the `ide-powershell`
-   package from the `apm install` command
+1. Follow the instructions in the Prerequisites section above
 
 2. Fork this repo, clone it to a local folder, and go to that folder in a terminal
 
