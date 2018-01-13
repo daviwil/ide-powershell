@@ -36,7 +36,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
   activate() {
     // Ensure dependency packages are installed
-    this.dependencyInstallPromise = packageDeps.install('ide-powershell');
+    this.dependencyInstallPromise = packageDeps.install('ide-powershell', false);
 
     super.activate();
   }
