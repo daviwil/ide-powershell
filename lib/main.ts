@@ -58,7 +58,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
     if (this.terminalTabService) {
       this.log.writeVerbose("terminal-tab service available, continuing...")
-      return await this._startTerminal();
+      return await this.startTerminal();
     }
     else {
       this.log.writeVerbose("Waiting for terminal-tab service...")
@@ -67,11 +67,11 @@ class PowerShellLanguageClient extends AutoLanguageClient {
           this.terminalTabServiceResolver = resolve;
       });
 
-      return await this._startTerminal();
+      return await this.startTerminal();
     }
   }
 
-  private _startTerminal() {
+  private async startTerminal() {
     this.log.writeVerbose("Starting PowerShell Editor Services in a terminal...");
 
     var sessionFilePath =
@@ -114,24 +114,27 @@ class PowerShellLanguageClient extends AutoLanguageClient {
         this.sessionSettings,
         this.terminalTabService);
 
-    return this.powerShellProcess.start("EditorServices").then(
-      (sessionDetails) => {
-        if (!sessionDetails) {
-          throw "Could not start PowerShell Editor Services"
-        }
+    var sessionDetails = await this.powerShellProcess.start("EditorServices");
+    if (!sessionDetails) {
+      throw "Could not start PowerShell Editor Services"
+    }
 
-        return new Promise<LanguageServerProcess>(
-            (resolve, reject) => {
-                var socket = net.connect(sessionDetails.languageServicePort);
-                socket.on(
-                    'connect',
-                    () => {
-                        this.log.write("Language service connected.");
-                        this.socket = socket;
-                        resolve(this.powerShellProcess.getProcess());
-                    });
-            });
-    })
+    await this.connectToLanguageService(sessionDetails);
+    return this.powerShellProcess.getProcess();
+  }
+
+  connectToLanguageService(sessionDetails: utils.EditorServicesSessionDetails) {
+    return new Promise(
+        (resolve, reject) => {
+            var socket = net.connect(sessionDetails.languageServicePort);
+            socket.on(
+                'connect',
+                () => {
+                    this.log.write("Language service connected.");
+                    this.socket = socket;
+                    resolve();
+                });
+        });
   }
 
   mapConfigurationObject(config) {
