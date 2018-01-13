@@ -11,15 +11,23 @@ import { Disposable } from 'atom';
 import { EventEmitter } from 'events';
 import { ITerminal, ITerminalService } from './terminalService';
 
+// Represents the interface expected by the atom-languageclient class,
+// even though they expect a child_process.ChildProcess instance.
+export interface LanguageServerProcess extends EventEmitter {
+    stderr: stream.Readable;
+    pid: number;
+
+    kill(signal?: string): void;
+    on(event: "error", listener: (err: Error) => void): this;
+    on(event: "exit", listener: (code: number, signal: string) => void): this;
+}
+
 export class PowerShellProcess {
 
-    private childProcess: cp.ChildProcess;
+    private languageServerProcess: LanguageServerProcess;
     private consoleTerminal: ITerminal = undefined;
     private consoleCloseSubscription: Disposable;
     private sessionDetails: utils.EditorServicesSessionDetails;
-
-    // private onExitedEmitter = new vscode.EventEmitter<void>();
-    // public onExited: vscode.Event<void> = this.onExitedEmitter.event;
 
     constructor(
         public exePath: string,
@@ -84,8 +92,8 @@ export class PowerShellProcess {
                         title: this.title
                       }).then((terminal) => {
                         this.consoleTerminal = terminal;
-                        this.childProcess =
-                          this.createFakeChildProcess(
+                        this.languageServerProcess =
+                          this.createLanguageServerProcess(
                             this.consoleTerminal.getProcess());
 
                         // Start the language client
@@ -123,14 +131,8 @@ export class PowerShellProcess {
         });
     }
 
-    public getProcess(): cp.ChildProcess {
-      // TODO: Find a better way to do this
-      // TODO: Filter 'error' events
-      let terminalProcess = this.consoleTerminal.getProcess();
-      var Readable = require('stream').Readable;
-      terminalProcess.stderr = new Readable();
-      terminalProcess.stderr._read = function fake() {};
-      return terminalProcess;
+    public getProcess(): LanguageServerProcess {
+      return this.languageServerProcess;
     }
 
     public showConsole(preserveFocus: boolean) {
@@ -156,39 +158,43 @@ export class PowerShellProcess {
         }
     }
 
-      private createFakeChildProcess(pty: any): cp.ChildProcess {
-      class FakeChildProcess extends EventEmitter {
-        public stdio: [stream.Writable, stream.Readable, stream.Readable];
-        public stdin: stream.Writable;
-        public stdout: stream.Readable;
+    private createLanguageServerProcess(pty) {
+      class PSLanguageServerProcess extends EventEmitter implements LanguageServerProcess {
         public stderr: stream.Readable;
-        public killed: boolean;
         public pid: number;
-        public connected: boolean;
 
-        public kill(signal?: string) {
+        constructor(private pty, private log: Logger) {
+          super();
 
+          // Fake the stderr stream for now
+          var Readable = require('stream').Readable;
+          this.stderr = new Readable();
+          this.stderr._read = function fake() {};
+
+          pty.on('exit', this.handleExit.bind(this));
+          pty.on('error', this.handleError.bind(this));
         }
 
-        public send(message: any, callback?: (error: Error) => void): boolean;
-        public send(message: any, sendHandle?: net.Socket | net.Server, callback?: (error: Error) => void): boolean;
-        public send(message: any, sendHandle?: net.Socket | net.Server, options?: cp.MessageOptions, callback?: (error: Error) => void): boolean {
-          return false;
+        public kill(signal?: string): void {
+          this.pty.kill(signal)
         }
 
-        public disconnect() {
-
+        private handleExit(code: number, signal: string) {
+          this.log.write(`powershell.exe exited: code ${code}, signal ${signal}`)
+          this.emit('exit', code, signal);
         }
 
-        public unref() {
-
-        }
-
-        public ref() {
-
+        private handleError(err: Error) {
+          if (err.message === 'read EIO') {
+            // This shows up when the terminal is killed by the user, ignore it
+          }
+          else {
+            this.log.writeError("powershell.exe exited due to an error:", err.toString());
+            this.emit('error', err);
+          }
         }
       }
 
-      return new FakeChildProcess();
+      return new PSLanguageServerProcess(pty, this.log);
     }
 }

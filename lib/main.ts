@@ -4,7 +4,7 @@ import utils = require('./utils');
 import cp = require('child_process');
 
 import { AutoLanguageClient } from 'atom-languageclient';
-import { PowerShellProcess } from './process';
+import { PowerShellProcess, LanguageServerProcess } from './process';
 import { PlatformDetails, getPlatformDetails, getDefaultPowerShellPath } from './platform';
 import { ITerminalService } from './terminalService';
 import { Logger } from './logging';
@@ -110,7 +110,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
           throw "Could not start PowerShell Editor Services"
         }
 
-        return new Promise<cp.ChildProcess>(
+        return new Promise<LanguageServerProcess>(
             (resolve, reject) => {
                 var socket = net.connect(sessionDetails.languageServicePort);
                 socket.on(
