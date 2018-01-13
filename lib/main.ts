@@ -105,7 +105,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
     this.powerShellProcess =
       new PowerShellProcess(
         powerShellExePath,
-        "PowerShell Integrated Terminal",
+        "PowerShell Integrated Console",
         this.log,
         editorServicesArgs,
         sessionFilePath,
