@@ -22,7 +22,7 @@ Once the build dependencies have been installed, you can install the `ide-powers
 package and its dependencies in Atom:
 
 ```
-$ apm install language-powershell terminal-tab-service ide-powershell
+$ apm install language-powershell terminal-tab-service atom-ide-ui ide-powershell
 ```
 
 ## Development
