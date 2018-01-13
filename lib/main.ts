@@ -2,6 +2,7 @@ import net = require('net');
 import path = require('path');
 import utils = require('./utils');
 import cp = require('child_process');
+import packageDeps = require('atom-package-deps');
 
 import { AutoLanguageClient } from 'atom-languageclient';
 import { PowerShellProcess, LanguageServerProcess } from './process';
@@ -19,6 +20,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   private sessionSettings: any;
   private terminalTabService: ITerminalService;
   private powerShellProcess: PowerShellProcess;
+  private dependencyInstallPromise: Promise<any>;
   private terminalTabServiceResolver: (ITerminalService) => void;
   private supportedExtensions = [ ".ps1", ".psm1", ".ps1xml" ];
   private platformDetails: PlatformDetails;
@@ -32,7 +34,19 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   getConnectionType() { return 'socket' }
   getRootConfigurationKey() { return 'ide-powershell' }
 
-  startServerProcess () {
+  activate() {
+    // Ensure dependency packages are installed
+    console.log("About to install dependencies!");
+    this.dependencyInstallPromise = packageDeps.install('ide-powershell');
+
+    super.activate();
+  }
+
+  async startServerProcess () {
+    await this.dependencyInstallPromise;
+    this.dependencyInstallPromise = null;
+    console.log("Done with dependencies!")
+
     // TODO: React to setting changes like vscode-powershell
     atom.config.observe('ide-powershell', (settings) => this.sessionSettings = settings);
 
@@ -42,26 +56,22 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
     this.platformDetails = getPlatformDetails();
 
-    var startPromise = undefined;
-
     if (this.terminalTabService) {
       this.log.writeVerbose("terminal-tab service available, continuing...")
-      startPromise = this._startTerminal();
+      return await this._startTerminal();
     }
     else {
       this.log.writeVerbose("Waiting for terminal-tab service...")
-      startPromise = new Promise(
+      await new Promise(
         (resolve, reject) => {
           this.terminalTabServiceResolver = resolve;
-      }).then(() => {
-        return this._startTerminal();
       });
-    }
 
-    return startPromise;
+      return await this._startTerminal();
+    }
   }
 
-  _startTerminal() {
+  private _startTerminal() {
     this.log.writeVerbose("Starting PowerShell Editor Services in a terminal...");
 
     var sessionFilePath =
