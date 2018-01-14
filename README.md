@@ -14,9 +14,9 @@ consider contributing if you want to help it get better faster!
 
 ## Platform Support
 
-- **Windows 7 through 10** with PowerShell v5.1 and higher
-- **Linux** with PowerShell v6 (all PowerShell-supported distributions)
-- **macOS and OS X** with PowerShell v6
+- **Windows** with PowerShell v5.1 and PowerShell Core v6
+- **Linux** with PowerShell Core v6 (all PowerShell-supported distributions)
+- **macOS and OS X** with PowerShell Core v6
 
 This package may work well with machines running PowerShell v3 and v4 but
 they are not officially supported by this package at this time.
