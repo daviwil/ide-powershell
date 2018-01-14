@@ -17,6 +17,9 @@ const requiredEditorServicesVersion = "1.5.1";
 class PowerShellLanguageClient extends AutoLanguageClient {
 
   private log: Logger;
+  private statusBar: any;
+  private statusTile: any;
+  private statusElement: HTMLSpanElement;
   private sessionSettings: any;
   private terminalTabService: ITerminalService;
   private powerShellProcess: PowerShellProcess;
@@ -38,8 +41,12 @@ class PowerShellLanguageClient extends AutoLanguageClient {
     // Ensure dependency packages are installed
     this.dependencyInstallPromise =
       require('atom-package-deps').install('ide-powershell', false).then(async () => {
+        this.updateStatusBar("$(terminal) Initializing...");
         await this.ensureEditorServicesIsInstalled();
       })
+
+    this.statusElement = document.createElement('span');
+    this.statusElement.className = 'inline-block text-color-info';
 
     super.activate();
   }
@@ -158,6 +165,14 @@ class PowerShellLanguageClient extends AutoLanguageClient {
         });
   }
 
+  updateStatusBar (text) {
+    this.statusElement.textContent = text
+    if (!this.statusTile && this.statusBar) {
+      console.log("CREATING STATUS ELEMENT")
+      this.statusTile = this.statusBar.addRightTile({ item: this.statusElement, priority: 1000 })
+    }
+  }
+
   mapConfigurationObject(config) {
     // Wrap the config object in a 'powershell' key
     return {
@@ -167,6 +182,11 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
   filterChangeWatchedFiles(filePath) {
     return this.supportedExtensions.indexOf(path.extname(filePath).toLowerCase()) > -1;
+  }
+
+  consumeStatusBar (statusBar) {
+    console.log("STATUS BAR AVAILABLE")
+    this.statusBar = statusBar
   }
 
   consumeTerminalTabService(terminalTabService) {
