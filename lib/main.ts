@@ -76,7 +76,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
     const modulesPath = path.resolve(__dirname, "../modules/");
     const zipPath = path.resolve(modulesPath, "PowerShellEditorServices.zip");
 
-    if (!fs.existsSync(path.resolve(modulesPath, "/PowerShellEditorServices"))) {
+    if (!fs.existsSync(path.resolve(modulesPath, "PowerShellEditorServices/"))) {
       atom.notifications.addInfo('Downloading PowerShell Editor Services...');
 
       await DownloadFile(
