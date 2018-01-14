@@ -1,6 +1,6 @@
 {
   "name": "ide-powershell",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "PowerShell language support for Atom-IDE.",
   "author": "David Wilson",
   "license": "MIT",
@@ -24,7 +24,11 @@
     "url": "https://github.com/daviwil/ide-powershell/issues"
   },
   "homepage": "https://github.com/daviwil/ide-powershell#readme",
-  "package-deps": ["language-powershell", "terminal-tab-service", "atom-ide-ui"],
+  "package-deps": [
+    "language-powershell",
+    "terminal-tab-service",
+    "atom-ide-ui"
+  ],
   "dependencies": {
     "@types/atom": "^1.21.8",
     "@types/node": "^8.0.41",
@@ -52,11 +56,26 @@
           "title": "PowerShell Editor Services Log Level",
           "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.",
           "enum": [
-            { "value": "Normal", "description": "Normal" },
-            { "value": "Warning", "description": "Warning" },
-            { "value": "Error", "description": "Error" },
-            { "value": "Verbose", "description": "Verbose" },
-            { "value": "Diagnostic", "description": "Diagnostic" }
+            {
+              "value": "Normal",
+              "description": "Normal"
+            },
+            {
+              "value": "Warning",
+              "description": "Warning"
+            },
+            {
+              "value": "Error",
+              "description": "Error"
+            },
+            {
+              "value": "Verbose",
+              "description": "Verbose"
+            },
+            {
+              "value": "Diagnostic",
+              "description": "Diagnostic"
+            }
           ]
         },
         "bundledModulesPath": {
