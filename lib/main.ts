@@ -4,6 +4,7 @@ import path = require('path');
 import utils = require('./utils');
 import cp = require('child_process');
 
+import { CompositeDisposable } from 'atom';
 import { AutoLanguageClient, DownloadFile } from 'atom-languageclient';
 import { PowerShellProcess, LanguageServerProcess } from './process';
 import { PlatformDetails, getPlatformDetails, getDefaultPowerShellPath } from './platform';
@@ -18,6 +19,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
   private log: Logger;
   private sessionSettings: any;
+  private disposables: CompositeDisposable;
   private terminalTabService: ITerminalService;
   private powerShellProcess: PowerShellProcess;
   private dependencyInstallPromise: Promise<any>;
@@ -35,6 +37,8 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   getRootConfigurationKey() { return 'ide-powershell' }
 
   activate() {
+    this.disposables = new CompositeDisposable();
+
     // Ensure dependency packages are installed
     this.dependencyInstallPromise =
       require('atom-package-deps').install('ide-powershell', false).then(async () => {
@@ -72,6 +76,19 @@ class PowerShellLanguageClient extends AutoLanguageClient {
     }
   }
 
+  public postInitialization(server) {
+    // NOTE: This is temporary until atom-languageclient PR #167 is merged
+    this.disposables.add(
+      atom.config.observe('ide-powershell', (settings) => {
+        const mappedConfig = this.mapConfigurationObject(settings || {});
+        if (mappedConfig) {
+          server.connection.didChangeConfiguration({
+            settings: mappedConfig,
+          });
+        }
+      }));
+  }
+
   private async ensureEditorServicesIsInstalled() {
     const modulesPath = path.resolve(__dirname, "../modules/");
     const zipPath = path.resolve(modulesPath, "PowerShellEditorServices.zip");
@@ -92,7 +109,6 @@ class PowerShellLanguageClient extends AutoLanguageClient {
       atom.notifications.addSuccess('PowerShell Editor Services installed!');
     }
   }
-
 
   private async startTerminal() {
     this.log.writeVerbose("Starting PowerShell Editor Services in a terminal...");
