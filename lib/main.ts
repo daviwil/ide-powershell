@@ -1,10 +1,10 @@
+import fs = require('fs');
 import net = require('net');
 import path = require('path');
 import utils = require('./utils');
 import cp = require('child_process');
-import packageDeps = require('atom-package-deps');
 
-import { AutoLanguageClient } from 'atom-languageclient';
+import { AutoLanguageClient, DownloadFile } from 'atom-languageclient';
 import { PowerShellProcess, LanguageServerProcess } from './process';
 import { PlatformDetails, getPlatformDetails, getDefaultPowerShellPath } from './platform';
 import { ITerminalService } from './terminalService';
@@ -25,7 +25,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   private supportedExtensions = [ ".ps1", ".psm1", ".ps1xml" ];
   private platformDetails: PlatformDetails;
 
-  // These are defined in the base class, redefined for typings
+  // This is defined in the base class, redefined for typings
   public socket: net.Socket;
 
   getGrammarScopes () { return [ 'source.powershell' ] }
@@ -36,7 +36,10 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
   activate() {
     // Ensure dependency packages are installed
-    this.dependencyInstallPromise = packageDeps.install('ide-powershell', false);
+    this.dependencyInstallPromise =
+      require('atom-package-deps').install('ide-powershell', false).then(async () => {
+        await this.ensureEditorServicesIsInstalled();
+      })
 
     super.activate();
   }
@@ -69,14 +72,34 @@ class PowerShellLanguageClient extends AutoLanguageClient {
     }
   }
 
+  private async ensureEditorServicesIsInstalled() {
+    const modulesPath = path.resolve(__dirname, "../modules/");
+    const zipPath = path.resolve(modulesPath, "PowerShellEditorServices.zip");
+
+    if (!fs.existsSync(path.resolve(modulesPath, "/PowerShellEditorServices"))) {
+      atom.notifications.addInfo('Downloading PowerShell Editor Services...');
+
+      await DownloadFile(
+        "https://github.com/PowerShell/PowerShellEditorServices/releases/download/v1.5.0/PowerShellEditorServices.zip",
+        zipPath,
+        (bytes, percent) => { /*console.log(`${percent}% downloaded`) */},
+        2103461 /* Known byte size of PowerShellEditorServices.zip */);
+
+      const decompress = require('decompress');
+      await decompress(zipPath, modulesPath);
+      fs.unlinkSync(zipPath);
+
+      atom.notifications.addSuccess('PowerShell Editor Services installed!');
+    }
+  }
+
+
   private async startTerminal() {
     this.log.writeVerbose("Starting PowerShell Editor Services in a terminal...");
 
     var sessionFilePath =
         utils.getSessionFilePath(
             Math.floor(100000 + Math.random() * 900000));
-
-    // TODO: Download PSES!
 
     var bundledModulesPath =
       this.sessionSettings.developer.bundledModulesPath ||

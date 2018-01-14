@@ -31,7 +31,8 @@
     "atom-languageclient": "^0.7.3",
     "atom-ts-transpiler": "^1.2.4",
     "atom-package-deps": "^4.6.1",
-    "typescript": "^2.6.1"
+    "typescript": "^2.6.1",
+    "decompress": "^4.2.0"
   },
   "enhancedScopes": [
     "source.powershell"
