@@ -1,7 +1,3 @@
-# 0.2.0
-
-No new features added, thanks apm :)
-
 # 0.1.0
 
 Initial release with the following PowerShell language features:
