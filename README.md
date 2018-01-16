@@ -1,16 +1,9 @@
 # ide-powershell
 
-Experimental [PowerShell](https://github.com/powershell/powershell) language support
-for [Atom](https://atom.io)
-
-## Overview
-
-This project leverages [atom-languageclient](https://github.com/atom/atom-languageclient)
-and [PowerShell Editor Services](https://github.com/PowerShell/PowerShellEditorServices)
-to provide rich PowerShell language features in the Atom editor.
-
-**DISCLAIMER:** I am developing this as a side project in my free time, so please
-consider contributing if you want to help it get better faster!
+This package provides rich [PowerShell](https://github.com/powershell/powershell)
+language features in the [Atom](https://atom.io) editor via
+[Atom IDE](https://ide.atom.io) and
+[PowerShell Editor Services](https://github.com/PowerShell/PowerShellEditorServices)!
 
 ## Platform Support
 
@@ -43,6 +36,11 @@ Packages and Themes" and then search for and install `ide-powershell`
 4. Open or restart Atom and then try loading a .ps1 file
 
 5. Change some code in this repo, run the "Reload Window" command, then try your changes!
+
+# Contributing
+
+We'd love to accept your contributions!  Please send a PR for small changes or
+file and issue in advance to discuss if you have a bigger change in mind.
 
 ## Maintainers
 
