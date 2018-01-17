@@ -48,7 +48,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
     super.activate();
   }
 
-  async startServerProcess () {
+  async startServerProcess (projectPath: string) {
     await this.dependencyInstallPromise;
     this.dependencyInstallPromise = null;
 
@@ -63,7 +63,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
     if (this.terminalTabService) {
       this.log.writeVerbose("terminal-tab service available, continuing...")
-      return await this.startTerminal();
+      return await this.startTerminal(projectPath);
     }
     else {
       this.log.writeVerbose("Waiting for terminal-tab service...")
@@ -72,7 +72,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
           this.terminalTabServiceResolver = resolve;
       });
 
-      return await this.startTerminal();
+      return await this.startTerminal(projectPath);
     }
   }
 
@@ -110,7 +110,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
     }
   }
 
-  private async startTerminal() {
+  private async startTerminal(projectPath: string) {
     this.log.writeVerbose("Starting PowerShell Editor Services in a terminal...");
 
     var sessionFilePath =
@@ -141,10 +141,12 @@ class PowerShellLanguageClient extends AutoLanguageClient {
 
     const powerShellExePath = getDefaultPowerShellPath(this.platformDetails);
 
+    const subTitle = projectPath ? ` - ${path.basename(projectPath)}` : '';
+
     this.powerShellProcess =
       new PowerShellProcess(
         powerShellExePath,
-        "PowerShell Integrated Console",
+        "PowerShell Integrated Console" + subTitle,
         this.log,
         editorServicesArgs,
         sessionFilePath,
