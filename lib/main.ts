@@ -77,16 +77,6 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   }
 
   public postInitialization(server) {
-    // NOTE: This is temporary until atom-languageclient PR #167 is merged
-    this.disposables.add(
-      atom.config.observe('ide-powershell', (settings) => {
-        const mappedConfig = this.mapConfigurationObject(settings || {});
-        if (mappedConfig) {
-          server.connection.didChangeConfiguration({
-            settings: mappedConfig,
-          });
-        }
-      }));
   }
 
   private async ensureEditorServicesIsInstalled() {

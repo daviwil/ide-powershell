@@ -32,7 +32,7 @@
   "dependencies": {
     "@types/atom": "^1.21.8",
     "@types/node": "^8.0.41",
-    "atom-languageclient": "^0.7.3",
+    "atom-languageclient": "^0.8.1",
     "atom-ts-transpiler": "^1.2.4",
     "atom-package-deps": "^4.6.1",
     "typescript": "^2.6.1",
