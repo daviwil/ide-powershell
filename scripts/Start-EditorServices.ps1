@@ -71,6 +71,8 @@ param(
     $ConfirmInstall
 )
 
+
+
 function ExitWithError($errorString) {
 
     Write-Host -ForegroundColor Red "`n`n$errorString"

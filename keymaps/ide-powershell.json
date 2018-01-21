@@ -1,0 +1,6 @@
+{
+  "atom-text-editor": {
+    "f5": "powershell:run-file",
+    "f8": "powershell:run-selection"
+  }
+}
