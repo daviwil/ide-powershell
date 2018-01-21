@@ -10,6 +10,7 @@ import { PowerShellProcess, LanguageServerProcess } from './process';
 import { PlatformDetails, getPlatformDetails, getDefaultPowerShellPath } from './platform';
 import { ITerminalService } from './terminalService';
 import { Logger } from './logging';
+import { ExtensionCommands } from "./extensionCommands";
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
@@ -26,6 +27,7 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   private terminalTabServiceResolver: (ITerminalService) => void;
   private supportedExtensions = [ ".ps1", ".psm1", ".ps1xml" ];
   private platformDetails: PlatformDetails;
+  private extensionCommands: ExtensionCommands;
 
   // This is defined in the base class, redefined for typings
   public socket: net.Socket;
@@ -77,6 +79,8 @@ class PowerShellLanguageClient extends AutoLanguageClient {
   }
 
   public postInitialization(server) {
+    this.extensionCommands = new ExtensionCommands();
+    this.extensionCommands.setLanguageClient(server.connection, this.log);
   }
 
   private async ensureEditorServicesIsInstalled() {
