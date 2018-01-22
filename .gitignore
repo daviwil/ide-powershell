@@ -4,6 +4,7 @@ logs/
 modules/*
 sessions/*
 !modules/README.md
+lib
 
 # Logs
 logs
