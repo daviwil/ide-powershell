@@ -2,8 +2,15 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
-        "outDir": "out",
+        "outDir": "lib",
         "lib": ["es6", "dom"],
-        "sourceMap": true
-    }
+        "sourceMap": true,
+        "jsx": "react",
+        "jsxFactory": "etch.dom"
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+    ],
+    "compileOnSave": true
 }

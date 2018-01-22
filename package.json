@@ -37,7 +37,8 @@
     "atom-package-deps": "^4.6.1",
     "atom-select-list": "^0.7.0",
     "typescript": "^2.6.1",
-    "decompress": "^4.2.0"
+    "decompress": "^4.2.0",
+    "etch": "^0.12.8"
   },
   "enhancedScopes": [
     "source.powershell"
