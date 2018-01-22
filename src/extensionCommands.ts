@@ -9,6 +9,12 @@ import { Logger } from "./logging";
 import { getSingleMenuSelection, IMenuItem, InputMenuResultReason } from "./menuSelect";
 import { getDebugSessionFilePath } from "./utils";
 
+export class AtomCommandInvocationRequest {
+    public static type =
+        new RequestType<string, EditorOperationResponse, object, object>(
+            "powerShell/atomCommandInvocation");
+}
+
 export class ShowChoicePromptRequest {
     public static type =
         new RequestType<IShowChoicePromptRequestArgs, IShowChoicePromptResponseBody, string, void>(
@@ -163,6 +169,10 @@ export class ExtensionCommands {
         this.clientConnection = languageClientConnection;
 
         this.clientConnection._onRequest(
+            AtomCommandInvocationRequest.type,
+            (command) => this.invokeAtomCommand(command));
+
+        this.clientConnection._onRequest(
             ShowInputPromptRequest.type,
             (promptDetails) => this.showInputPrompt(promptDetails));
 
@@ -209,6 +219,16 @@ export class ExtensionCommands {
         this.clientConnection._onRequest(
             ShowInformationMessageRequest.type,
             (message) => this.showInformationMessage(message));
+    }
+
+    private invokeAtomCommand(command: string): EditorOperationResponse {
+        // TODO: Add arguments/return value/check if registered
+        atom.commands.dispatch(
+            atom.views.getView(
+                atom.workspace.getActiveTextEditor()),
+            command);
+
+        return EditorOperationResponse.Completed;
     }
 
     private showInputPrompt(promptDetails: IShowInputPromptRequestArgs): Thenable<IShowInputPromptResponseBody> {
